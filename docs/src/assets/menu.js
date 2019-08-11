@@ -475,6 +475,11 @@ const layout = [
       {
         name: 'Grid Gutter',
         path: 'gutter'
+      },
+      {
+        name: 'Flex Playground',
+        badge: 'new',
+        path: 'flex-playground'
       }
     ]
   },
