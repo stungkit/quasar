@@ -54,7 +54,7 @@ export default Vue.extend({
     autofocus: Boolean,
 
     maxlength: [Number, String],
-    maxValues: [Number, String] // do not add to JSON, internally needed by QSelect
+    maxValues: [Number, String] // private, do not add to JSON; internally needed by QSelect
   },
 
   data () {
@@ -64,7 +64,7 @@ export default Vue.extend({
       // used internally by validation for QInput
       // or menu handling for QSelect
       innerLoading: false,
-      targetUid: 'qf_' + uid()
+      targetUid: this.$attrs.for === void 0 ? 'qf_' + uid() : this.$attrs.for
     }
   },
 

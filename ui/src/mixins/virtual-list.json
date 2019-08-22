@@ -16,12 +16,12 @@
       "category": "virtual-list"
     },
 
-    "virtual-list-item-default-size": {
+    "virtual-list-item-size": {
       "type": "Number",
-      "desc": "Default size of an option (height or width for horizontal mode), in px - will be used for rendering the initial list. Try to use a value close to the minimum size of an item.",
+      "desc": "Default size of an option (representing height for default mode or width for horizontal mode), in pixels; This value is used for rendering the initial list; Try to use a value close to the minimum size of an item",
       "default": "24",
       "examples": [
-        ":virtual-list-item-default-size=\"48\""
+        ":virtual-list-item-size=\"48\""
       ],
       "category": "virtual-list"
     }
@@ -47,15 +47,34 @@
   },
 
   "events": {
-    "scroll": {
+    "virtual-scroll": {
       "desc": "Emitted when the virtual list scrolls",
       "params": {
-        "index": {
-          "type": "Number",
-          "desc": "Index of the list item that was scrolled into view (0 based)",
-          "examples": [
-            10
-          ]
+        "details": {
+          "type": "Object",
+          "desc": "Object of properties on the new scroll position",
+          "definition": {
+            "index": {
+              "type": "Number",
+              "desc": "Index of the list item that was scrolled into view (0 based)",
+              "examples": [ 30 ]
+            },
+            "from": {
+              "type": "Number",
+              "desc": "The index of the first list item that is rendered (0 based)",
+              "examples": [ 10 ]
+            },
+            "to": {
+              "type": "Number",
+              "desc": "The index of the last list item that is rendered (0 based)",
+              "examples": [ 50 ]
+            },
+            "direction": {
+              "type": "String",
+              "desc": "Direction of change",
+              "values": [ "increase", "decrease" ]
+            }
+          }
         }
       }
     }
