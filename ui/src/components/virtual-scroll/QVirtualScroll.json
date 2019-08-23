@@ -1,12 +1,12 @@
 {
-  "mixins": [ "mixins/virtual-list" ],
+  "mixins": [ "mixins/virtual-scroll" ],
 
   "props": {
-    "component": {
+    "type": {
       "type": "String",
-      "desc": "HTML tag or component name to render as container",
-      "default": "div",
-      "examples": [ "div", "q-list" ],
+      "desc": "The type of content: list (default) or table",
+      "default": "list",
+      "values": [ "list", "table" ],
       "category": "content"
     },
 
@@ -66,6 +66,16 @@
         "scroll-target=\"body\""
       ],
       "category": "behavior"
+    }
+  },
+
+  "slots" : {
+    "before": {
+      "desc": "Template slot for the elements that should be rendered before the list; Suggestion: thead before a table"
+    },
+
+    "after": {
+      "desc": "Template slot for the elements that should be rendered after the list; Suggestion: tfoot after a table"
     }
   },
 

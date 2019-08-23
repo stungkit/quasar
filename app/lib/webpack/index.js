@@ -92,6 +92,21 @@ async function getElectron (cfg) {
   }
 }
 
+async function getTauri (cfg) {
+  const chain = createChain(cfg, 'Tauri')
+
+  require('./tauri')(chain, cfg)
+  
+  return await getWebpackConfig(chain, cfg, {
+    name: 'Tauri',
+    hot: true,
+    invokeParams: {
+      isClient: true,
+      isServer: false
+    }
+  })
+}
+
 async function getSSR (cfg) {
   const
     client = createChain(cfg, 'Client'),
@@ -125,6 +140,9 @@ module.exports = async function (cfg) {
   }
   else if (mode.electron) {
     return await getElectron(cfg)
+  }
+  else if (mode.tauri) {
+    return await getTauri(cfg)
   }
   else if (mode.cordova) {
     return await getCordova(cfg)
