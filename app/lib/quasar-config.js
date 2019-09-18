@@ -12,7 +12,8 @@ const
   warn = logger('app:quasar-conf', 'red'),
   appFilesValidations = require('./app-files-validations'),
   extensionRunner = require('./app-extension/extensions-runner'),
-  supportIE = require('./helpers/support-ie')
+  supportIE = require('./helpers/support-ie'),
+  cssVariables = require('./helpers/css-variables')
 
 function encode (obj) {
   return JSON.stringify(obj, (key, value) => {
@@ -24,7 +25,7 @@ function encode (obj) {
 
 function formatPublicPath (path) {
   if (!path) {
-    return path || ''
+    return ''
   }
 
   if (!path.endsWith('/')) {
@@ -359,6 +360,9 @@ class QuasarConfig {
       cfg.extras = cfg.extras.filter(uniqueFilter)
     }
 
+    if (cfg.framework.all !== true && cfg.framework.all !== 'auto') {
+      cfg.framework.all = false
+    }
     cfg.framework.components = cfg.framework.components.filter(uniqueFilter)
     cfg.framework.directives = cfg.framework.directives.filter(uniqueFilter)
     cfg.framework.plugins = cfg.framework.plugins.filter(uniqueFilter)
@@ -429,8 +433,8 @@ class QuasarConfig {
 
     cfg.build.transpileDependencies = cfg.build.transpileDependencies.filter(uniqueRegexFilter)
 
-    cfg.__loadingBar = cfg.framework.all || cfg.framework.plugins.includes('LoadingBar')
-    cfg.__meta = cfg.framework.all || cfg.framework.plugins.includes('Meta')
+    cfg.__loadingBar = cfg.framework.all === true || cfg.framework.plugins.includes('LoadingBar')
+    cfg.__meta = cfg.framework.all === true || cfg.framework.plugins.includes('Meta')
 
     if (this.ctx.dev || this.ctx.debug) {
       Object.assign(cfg.build, {
@@ -550,6 +554,7 @@ class QuasarConfig {
         open: true
       }, cfg.devServer, {
         contentBase: false,
+        watchContentBase: false,
 
         before: app => {
           if (!this.ctx.mode.ssr) {
@@ -818,7 +823,12 @@ class QuasarConfig {
           // more options:
           // https://github.com/kangax/html-minifier#options-quick-reference
         }
-        : undefined
+        : void 0
+    }
+
+    // used by .quasar entry templates
+    cfg.__css = {
+      quasarSrcExt: cssVariables.quasarSrcExt
     }
 
     this.webpackConfig = await require('./webpack')(cfg)
