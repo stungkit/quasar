@@ -385,7 +385,7 @@ class QuasarConfig {
       htmlFilename: 'index.html',
       webpackManifest: this.ctx.prod,
       vueRouterMode: 'hash',
-      preloadChunks: true,
+      preloadChunks: this.ctx.prod,
       forceDevPublicPath: false,
       // transpileDependencies: [], // leaving here for completeness
       devtool: this.ctx.dev
@@ -450,6 +450,7 @@ class QuasarConfig {
     }
     if (this.ctx.dev) {
       cfg.build.extractCSS = false
+      cfg.build.preloadChunks = false
     }
     if (this.ctx.debug) {
       cfg.build.sourceMap = true
@@ -467,7 +468,8 @@ class QuasarConfig {
         htmlFilename: 'index.html',
         vueRouterMode: 'hash',
         gzip: false,
-        webpackManifest: false
+        webpackManifest: false,
+        preloadChunks: false
       })
     }
 
@@ -528,7 +530,11 @@ class QuasarConfig {
 
       cfg.ssr.debug = this.ctx.debug
 
-      cfg.ssr.__templateOpts = JSON.stringify(cfg.ssr, null, 2)
+      cfg.ssr.__templateOpts = JSON.stringify(
+        Object.assign({}, cfg.ssr, { preloadChunks: cfg.build.preloadChunks === true }),
+        null,
+        2
+      )
       cfg.ssr.__templateFlags = {
         meta: cfg.__meta
       }
@@ -630,6 +636,7 @@ class QuasarConfig {
 
     if (this.ctx.mode.pwa) {
       cfg.build.webpackManifest = false
+      cfg.build.preloadChunks = true
 
       cfg.pwa = merge({
         workboxPluginMode: 'GenerateSW',
