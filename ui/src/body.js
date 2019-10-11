@@ -20,18 +20,24 @@ function getBodyClasses ({ is, has, within }, cfg) {
     }
   }
 
-  if (is.cordova === true) {
-    cls.push('cordova')
+  if (is.nativeMobile === true) {
+    const type = is.nativeMobileWrapper
+
+    cls.push(type)
+    cls.push('native-mobile')
 
     if (
       is.ios === true &&
-      (cfg.cordova === void 0 || cfg.cordova.iosStatusBarPadding !== false)
+      (cfg[type] === void 0 || cfg[type].iosStatusBarPadding !== false)
     ) {
       cls.push('q-ios-padding')
     }
   }
   else if (is.electron === true) {
     cls.push('electron')
+  }
+  else if (is.bex === true) {
+    cls.push('bex')
   }
 
   within.iframe === true && cls.push('within-iframe')
