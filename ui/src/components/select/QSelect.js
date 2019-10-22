@@ -16,13 +16,14 @@ import { stop, prevent, stopAndPrevent } from '../../utils/event.js'
 import { normalizeToInterval } from '../../utils/format.js'
 
 import VirtualScroll from '../../mixins/virtual-scroll.js'
+import CompositionMixin from '../../mixins/composition.js'
 
 const validateNewValueMode = v => ['add', 'add-unique', 'toggle'].includes(v)
 
 export default Vue.extend({
   name: 'QSelect',
 
-  mixins: [ QField, VirtualScroll ],
+  mixins: [ QField, VirtualScroll, CompositionMixin ],
 
   props: {
     value: {
@@ -434,7 +435,8 @@ export default Vue.extend({
       // and so it will also close the QDialog, which is wrong)
       if (e.keyCode === 27 && this.menu === true) {
         stop(e)
-        this.__closeMenu()
+        // on ESC we need to close the dialog also
+        this.hidePopup()
       }
       this.$emit('keyup', e)
     },
@@ -446,13 +448,15 @@ export default Vue.extend({
     __onTargetKeydown (e) {
       this.$emit('keydown', e)
 
+      const tabShouldSelect = e.shiftKey !== true && this.multiple !== true && this.optionIndex > -1
+
       // escape
       if (e.keyCode === 27) {
         return
       }
 
       // tab
-      if (e.keyCode === 9) {
+      if (e.keyCode === 9 && tabShouldSelect === false) {
         this.__closeMenu()
         return
       }
@@ -470,7 +474,7 @@ export default Vue.extend({
         return
       }
 
-      // delete
+      // backspace
       if (
         e.keyCode === 8 &&
         this.multiple === true &&
@@ -512,10 +516,66 @@ export default Vue.extend({
         }
       }
 
-      // enter
-      if (e.target !== this.$refs.target || e.keyCode !== 13) { return }
+      // keyboard search when not having use-input
+      if (optionsLength > 0 && this.useInput !== true && e.keyCode >= 48 && e.keyCode <= 90) {
+        this.menu !== true && this.showPopup(e)
 
-      stopAndPrevent(e)
+        // clear search buffer if expired
+        if (this.searchBuffer === void 0 || this.searchBufferExp < Date.now()) {
+          this.searchBuffer = ''
+        }
+
+        const
+          char = String.fromCharCode(e.keyCode).toLocaleLowerCase(),
+          keyRepeat = this.searchBuffer.length === 1 && this.searchBuffer[0] === char
+
+        this.searchBufferExp = Date.now() + 1500
+        if (keyRepeat === false) {
+          this.searchBuffer += char
+        }
+
+        const searchRe = new RegExp('^' + this.searchBuffer.split('').join('.*'), 'i')
+
+        let index = this.optionIndex
+
+        if (keyRepeat === true || searchRe.test(this.__getOptionLabel(this.options[index])) !== true) {
+          do {
+            index = normalizeToInterval(index + 1, -1, optionsLength - 1)
+          }
+          while (index !== this.optionIndex && (
+            this.__isDisabled(this.options[index]) === true ||
+            searchRe.test(this.__getOptionLabel(this.options[index])) !== true
+          ))
+        }
+
+        if (this.optionIndex !== index) {
+          this.$nextTick(() => {
+            this.setOptionIndex(index)
+            this.scrollTo(index)
+
+            if (index >= 0 && this.useInput === true && this.fillInput === true) {
+              const inputValue = this.__getOptionLabel(this.options[index])
+              if (this.inputValue !== inputValue) {
+                this.inputValue = inputValue
+              }
+            }
+          })
+        }
+
+        return
+      }
+
+      // enter, space (when not using use-input), or tab (when not using multiple and option selected)
+      if (
+        e.target !== this.$refs.target ||
+        (
+          e.keyCode !== 13 &&
+          (this.useInput === true || e.keyCode !== 32) &&
+          (tabShouldSelect === false || e.keyCode !== 9)
+        )
+      ) { return }
+
+      e.keyCode !== 9 && stopAndPrevent(e)
 
       if (this.optionIndex > -1 && this.optionIndex < optionsLength) {
         this.toggleOption(this.options[this.optionIndex])
@@ -637,32 +697,31 @@ export default Vue.extend({
     },
 
     __getControl (h, fromDialog) {
-      let data = { attrs: {} }
       const child = this.__getSelection(h, fromDialog)
 
       if (this.useInput === true && (fromDialog === true || this.hasDialog === false)) {
         child.push(this.__getInput(h, fromDialog))
       }
       else if (this.editable === true) {
-        data = {
+        const isShadowField = this.hasDialog === true && fromDialog !== true && this.menu === true
+
+        child.push(h('div', {
           // there can be only one (when dialog is opened the control in dialog should be target)
-          ref: this.hasDialog === true && fromDialog !== true && this.menu === true ? void 0 : 'target',
+          ref: isShadowField === true ? void 0 : 'target',
+          staticClass: 'no-outline',
           attrs: {
             tabindex: 0,
-            autofocus: this.autofocus
+            id: isShadowField === true ? void 0 : this.targetUid
           },
           on: {
             keydown: this.__onTargetKeydown,
             keyup: this.__onTargetKeyup,
             keypress: this.__onTargetKeypress
           }
-        }
+        }))
       }
 
-      Object.assign(data.attrs, this.$attrs)
-      data.staticClass = 'q-field__native row items-center'
-
-      return h('div', data, child)
+      return h('div', { staticClass: 'q-field__native row items-center', attrs: this.$attrs }, child)
     },
 
     __getOptions (h) {
@@ -709,41 +768,20 @@ export default Vue.extend({
         : null
     },
 
-    __onCompositionStart (e) {
-      e.target.composing = true
-    },
-
-    __onCompositionUpdate (e) {
-      if (typeof e.data === 'string' && e.data.codePointAt(0) < 256) {
-        e.target.composing = false
-      }
-    },
-
-    __onCompositionEnd (e) {
-      if (e.target.composing !== true) { return }
-      e.target.composing = false
-
-      this.__onInputValue(e)
-    },
-
     __getInput (h, fromDialog) {
       const on = {
-        input: this.__onInputValue,
+        input: this.__onInput,
         // Safari < 10.2 & UIWebView doesn't fire compositionend when
         // switching focus before confirming composition choice
         // this also fixes the issue where some browsers e.g. iOS Chrome
         // fires "change" instead of "input" on autocomplete.
-        change: this.__onCompositionEnd,
-        compositionstart: this.__onCompositionStart,
-        compositionend: this.__onCompositionEnd,
+        change: this.__onChange,
         keydown: this.__onTargetKeydown,
         keyup: this.__onTargetKeyup,
         keypress: this.__onTargetKeypress
       }
 
-      if (this.$q.platform.is.android === true) {
-        on.compositionupdate = this.__onCompositionUpdate
-      }
+      on.compositionstart = on.compositionupdate = on.compositionend = this.__onComposition
 
       if (this.hasDialog === true) {
         on.click = stop
@@ -769,7 +807,11 @@ export default Vue.extend({
       })
     },
 
-    __onInputValue (e) {
+    __onChange (e) {
+      this.__onComposition(e)
+    },
+
+    __onInput (e) {
       clearTimeout(this.inputTimer)
 
       if (e && e.target && e.target.composing === true) {
@@ -885,6 +927,7 @@ export default Vue.extend({
           }
           if (this.hasDialog !== true && this.menu === true) {
             this.__closeMenu()
+            this.$refs.target !== void 0 && this.$refs.target.focus()
           }
           else {
             this.showPopup(e)
@@ -939,6 +982,7 @@ export default Vue.extend({
 
     __onDialogFieldFocus (e) {
       stop(e)
+      this.$refs.target !== void 0 && this.$refs.target.focus()
       this.dialogFieldFocused = true
       window.scrollTo(window.pageXOffset || window.scrollX || document.body.scrollLeft || 0, 0)
     },
@@ -1003,6 +1047,7 @@ export default Vue.extend({
       return h(QDialog, {
         props: {
           value: this.dialog,
+          noRefocus: true,
           position: this.useInput === true ? 'top' : void 0,
           transitionShow: this.transitionShowComputed,
           transitionHide: this.transitionHide
@@ -1041,7 +1086,14 @@ export default Vue.extend({
         return
       }
 
-      this.menu = false
+      if (this.menu === true) {
+        this.menu = false
+
+        // allow $refs.target to move to the field (when dialog)
+        this.$nextTick(() => {
+          this.$refs.target !== void 0 && this.$refs.target.focus()
+        })
+      }
 
       if (this.focused === false) {
         clearTimeout(this.filterId)
