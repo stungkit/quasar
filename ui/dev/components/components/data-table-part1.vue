@@ -2,7 +2,7 @@
   <div>
     <div class="q-layout-padding" style="max-width: 1400px;">
       <h4>QMarkupTable</h4>
-      <q-markup-table :separator="separator" wrap-cells>
+      <q-markup-table flat bordered :separator="separator" wrap-cells>
         <thead>
           <tr>
             <th class="text-left">
@@ -138,6 +138,8 @@
         :columns="columns"
         :filter="filter"
         :title="title"
+        bordered
+        flat
         binary-state-sort
         :rows-per-page-options="[]"
         row-key="name"
@@ -309,6 +311,7 @@
         dark
         class="bg-black"
         color="orange"
+        bordered
         :separator="separator"
         :data="data"
         :columns="columns"

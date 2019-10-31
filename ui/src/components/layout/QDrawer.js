@@ -1,10 +1,13 @@
 import Vue from 'vue'
 
 import HistoryMixin from '../../mixins/history.js'
-import TouchPan from '../../directives/TouchPan.js'
-import { between } from '../../utils/format.js'
 import ModelToggleMixin from '../../mixins/model-toggle.js'
 import PreventScrollMixin from '../../mixins/prevent-scroll.js'
+import DarkMixin from '../../mixins/dark.js'
+
+import TouchPan from '../../directives/TouchPan.js'
+
+import { between } from '../../utils/format.js'
 import slot from '../../utils/slot.js'
 
 const duration = 150
@@ -29,7 +32,7 @@ export default Vue.extend({
     }
   },
 
-  mixins: [ HistoryMixin, ModelToggleMixin, PreventScrollMixin ],
+  mixins: [ DarkMixin, HistoryMixin, ModelToggleMixin, PreventScrollMixin ],
 
   directives: {
     TouchPan
@@ -104,6 +107,7 @@ export default Vue.extend({
         this.lastDesktopState !== false
       ) { // from xs to lg
         if (this.showing === true) {
+          this.__applyPosition(0)
           this.__applyBackdrop(0)
           this.__cleanup()
         }
@@ -267,6 +271,7 @@ export default Vue.extend({
     classes () {
       return `q-drawer--${this.side}` +
         (this.bordered === true ? ' q-drawer--bordered' : '') +
+        (this.isDark === true ? ' q-drawer--dark q-dark' : '') +
         (
           this.belowBreakpoint === true
             ? ' fixed q-drawer--on-top q-drawer--mobile q-drawer--top-padding'
@@ -337,7 +342,11 @@ export default Vue.extend({
         ) {
           position += this.stateDirection * this.layout.scrollbarWidth
         }
-        this.$refs.content.style.transform = `translateX(${position}px)`
+
+        if (this.__lastPosition !== position) {
+          this.$refs.content.style.transform = `translateX(${position}px)`
+          this.__lastPosition = position
+        }
       }
     },
 
