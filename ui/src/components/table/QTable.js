@@ -92,6 +92,8 @@ export default Vue.extend({
     tableClass: [String, Array, Object],
     tableHeaderStyle: [String, Array, Object],
     tableHeaderClass: [String, Array, Object],
+    cardContainerClass: [String, Array, Object],
+    cardContainerStyle: [String, Array, Object],
     cardStyle: [String, Array, Object],
     cardClass: [String, Array, Object]
   },
@@ -194,6 +196,7 @@ export default Vue.extend({
 
     containerClass () {
       return `q-table__container q-table--${this.separator}-separator` +
+        (this.loading === true ? ' q-table--loading' : '') +
         (this.grid === true ? ' q-table--grid' : this.cardDefaultClass) +
         (this.isDark === true ? ` q-table--dark` : '') +
         (this.dense === true ? ` q-table--dense` : '') +
@@ -261,6 +264,9 @@ export default Vue.extend({
             items: this.computedRows,
             type: '__qtable'
           },
+          on: {
+            'virtual-scroll': this.__onVScroll
+          },
           class: this.tableClass,
           style: this.tableStyle,
           scopedSlots: {
@@ -276,6 +282,10 @@ export default Vue.extend({
           header,
           this.getTableBody(h)
         ])
+    },
+
+    __onVScroll (info) {
+      this.$emit('virtual-scroll', info)
     }
   }
 })
