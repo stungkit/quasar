@@ -5,7 +5,8 @@ import QResizeObserver from '../resize-observer/QResizeObserver.js'
 import TimeoutMixin from '../../mixins/timeout.js'
 
 import { stop } from '../../utils/event.js'
-import slot from '../../utils/slot.js'
+import { slot } from '../../utils/slot.js'
+import { cache } from '../../utils/vm.js'
 
 function getIndicatorClass (color, top, vertical) {
   const pos = vertical === true
@@ -229,12 +230,14 @@ export default Vue.extend({
       const
         size = domSize[this.domProps.container],
         scrollSize = this.$refs.content[this.domProps.content],
-        scroll = scrollSize > size
+        scroll = size > 0 && scrollSize > size // when there is no tab, in Chrome, size === 0 and scrollSize === 1
 
       if (this.scrollable !== scroll) {
         this.scrollable = scroll
-        scroll === true && this.$nextTick(() => this.__updateArrows())
       }
+
+      // Arrows need to be updated even if the scroll status was already true
+      scroll === true && this.$nextTick(() => this.__updateArrows())
 
       const justify = size < parseInt(this.breakpoint, 10)
 
@@ -379,12 +382,12 @@ export default Vue.extend({
   render (h) {
     const child = [
       h(QResizeObserver, {
-        on: { resize: this.__updateContainer }
+        on: cache(this, 'resize', { resize: this.__updateContainer })
       }),
 
       h('div', {
         ref: 'content',
-        staticClass: 'q-tabs__content row no-wrap items-center self-stretch',
+        staticClass: 'q-tabs__content row no-wrap items-center self-stretch hide-scrollbar',
         class: this.alignClass
       }, slot(this, 'default'))
     ]

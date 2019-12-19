@@ -8,7 +8,8 @@ import DarkMixin from '../../mixins/dark.js'
 import TouchPan from '../../directives/TouchPan.js'
 
 import { between } from '../../utils/format.js'
-import slot from '../../utils/slot.js'
+import { slot } from '../../utils/slot.js'
+import { cache } from '../../utils/vm.js'
 
 const duration = 150
 
@@ -20,6 +21,10 @@ const directiveTemplate = {
     mouseAllDir: true
   }
 }
+
+const mouseEvents = [
+  'mouseover', 'mouseout', 'mouseenter', 'mouseleave'
+]
 
 export default Vue.extend({
   name: 'QDrawer',
@@ -84,7 +89,7 @@ export default Vue.extend({
   data () {
     const belowBreakpoint = (
       this.behavior === 'mobile' ||
-      (this.behavior !== 'desktop' && this.layout.width <= this.breakpoint)
+      (this.behavior !== 'desktop' && this.layout.totalWidth <= this.breakpoint)
     )
 
     return {
@@ -117,7 +122,7 @@ export default Vue.extend({
       }
     },
 
-    'layout.width' (val) {
+    'layout.totalWidth' (val) {
       this.__updateLocal('belowBreakpoint', (
         this.behavior === 'mobile' ||
         (this.behavior !== 'desktop' && val <= this.breakpoint)
@@ -132,14 +137,14 @@ export default Vue.extend({
     behavior (val) {
       this.__updateLocal('belowBreakpoint', (
         val === 'mobile' ||
-        (val !== 'desktop' && this.layout.width <= this.breakpoint)
+        (val !== 'desktop' && this.layout.totalWidth <= this.breakpoint)
       ))
     },
 
     breakpoint (val) {
       this.__updateLocal('belowBreakpoint', (
         this.behavior === 'mobile' ||
-        (this.behavior !== 'desktop' && this.layout.width <= val)
+        (this.behavior !== 'desktop' && this.layout.totalWidth <= val)
       ))
     },
 
@@ -292,13 +297,17 @@ export default Vue.extend({
 
     onNativeEvents () {
       if (this.belowBreakpoint !== true) {
-        return {
-          '!click': e => { this.$emit('click', e) },
-          mouseover: e => { this.$emit('mouseover', e) },
-          mouseout: e => { this.$emit('mouseout', e) },
-          mouseenter: e => { this.$emit('mouseenter', e) },
-          mouseleave: e => { this.$emit('mouseleave', e) }
+        const evt = {
+          '!click': e => { this.$emit('click', e) }
         }
+
+        mouseEvents.forEach(name => {
+          evt[name] = e => {
+            this.$listeners[name] !== void 0 && this.$emit(name, e)
+          }
+        })
+
+        return evt
       }
     },
 
@@ -559,12 +568,12 @@ export default Vue.extend({
       this[`__${action}`](false, true)
     }
 
-    if (this.layout.width !== 0) {
+    if (this.layout.totalWidth !== 0) {
       fn()
       return
     }
 
-    this.watcher = this.$watch('layout.width', () => {
+    this.watcher = this.$watch('layout.totalWidth', () => {
       this.watcher()
       this.watcher = void 0
 
@@ -611,7 +620,7 @@ export default Vue.extend({
         style: this.lastBackdropBg !== void 0
           ? { backgroundColor: this.lastBackdropBg }
           : null,
-        on: { click: this.hide },
+        on: cache(this, 'bkdrop', { click: this.hide }),
         directives: this.noSwipeBackdrop !== true
           ? this.closeDirective
           : void 0

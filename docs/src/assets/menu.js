@@ -31,7 +31,6 @@ const gettingStarted = [
   },
   {
     name: 'Release notes',
-    badge: 'updated',
     path: 'release-notes'
   },
   {
@@ -55,23 +54,19 @@ const contributionGuide = [
   },
   {
     name: 'Running Projects',
-    path: 'running-projects',
-    badge: 'new'
+    path: 'running-projects'
   },
   {
     name: 'Start a New Project',
-    path: 'new-project',
-    badge: 'new'
+    path: 'new-project'
   },
   {
     name: 'Project Maintainer Role',
-    path: 'project-maintainer',
-    badge: 'new'
+    path: 'project-maintainer'
   },
   {
     name: 'Commit Conventions',
-    path: 'commit-conventions',
-    badge: 'new'
+    path: 'commit-conventions'
   }
 ]
 
@@ -435,6 +430,11 @@ const cli = [
         path: 'app-icons-electron'
       },
       {
+        name: 'Node Integration',
+        badge: 'update',
+        path: 'node-integration'
+      },
+      {
         name: 'Electron Packages',
         path: 'electron-packages'
       },
@@ -499,6 +499,11 @@ const style = [
   {
     name: 'Breakpoints',
     path: 'breakpoints'
+  },
+  {
+    name: 'Body classes',
+    badge: 'update',
+    path: 'body-classes'
   },
   {
     name: 'Visibility',
@@ -975,6 +980,7 @@ const components = [
   },
   {
     name: 'Tree',
+    badge: 'update',
     path: 'tree'
   },
   {
@@ -1085,6 +1091,7 @@ const utils = [
   },
   {
     name: 'Other Utils',
+    badge: 'update',
     path: 'other-utils'
   }
 ]
@@ -1177,7 +1184,7 @@ const backends = [
 
 module.exports = [
   {
-    name: 'Introduction to Quasar',
+    name: 'Why Quasar?',
     icon: 'room',
     path: 'introduction-to-quasar'
   },

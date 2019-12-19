@@ -7,6 +7,8 @@ import DarkMixin from '../../mixins/dark.js'
 
 import { stop } from '../../utils/event.js'
 import { between } from '../../utils/format.js'
+import { isKeyCode } from '../../utils/key-composition.js'
+import { cache } from '../../utils/vm.js'
 
 export default Vue.extend({
   name: 'QPagination',
@@ -125,7 +127,7 @@ export default Vue.extend({
         this.$q.iconSet.pagination.next,
         this.$q.iconSet.pagination.last
       ]
-      return this.$q.lang.rtl ? ico.reverse() : ico
+      return this.$q.lang.rtl === true ? ico.reverse() : ico
     }
   },
 
@@ -227,11 +229,11 @@ export default Vue.extend({
           min: this.min,
           max: this.max
         },
-        on: {
+        on: cache(this, 'inp', {
           input: value => { this.newPage = value },
-          keyup: e => { e.keyCode === 13 && this.__update() },
-          blur: () => { this.__update() }
-        }
+          keyup: e => { isKeyCode(e, 13) === true && this.__update() },
+          blur: this.__update
+        })
       }))
     }
     else { // is type select
@@ -340,8 +342,8 @@ export default Vue.extend({
       h('div', {
         staticClass: 'row justify-center',
         on: this.input === true
-          ? { input: stop }
-          : {}
+          ? cache(this, 'stop', { input: stop })
+          : null
       }, [
         contentMiddle
       ]),

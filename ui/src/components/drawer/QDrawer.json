@@ -1,6 +1,10 @@
 {
   "mixins": [ "mixins/model-toggle" ],
 
+  "meta": {
+    "docsUrl": "https://v1.quasar.dev/layout/drawer"
+  },
+
   "props": {
     "side": {
       "type": "String",
@@ -135,7 +139,7 @@
 
   "slots": {
     "default": {
-      "desc": "Default slot in the devland unslotted content of the component (overriden by 'mini' slot if used and drawer is in mini mode)"
+      "desc": "Default slot in the devland unslotted content of the component (overridden by 'mini' slot if used and drawer is in mini mode)"
     },
 
     "mini": {

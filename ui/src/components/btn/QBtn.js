@@ -5,9 +5,10 @@ import QSpinner from '../spinner/QSpinner.js'
 
 import BtnMixin from '../../mixins/btn.js'
 
-import slot from '../../utils/slot.js'
-import { stopAndPrevent, listenOpts } from '../../utils/event.js'
+import { mergeSlot } from '../../utils/slot.js'
+import { stop, prevent, stopAndPrevent, listenOpts } from '../../utils/event.js'
 import { getTouchTarget } from '../../utils/touch.js'
+import { isKeyCode } from '../../utils/key-composition.js'
 
 const { passiveCapture } = listenOpts
 
@@ -40,8 +41,11 @@ export default Vue.extend({
         )
     },
 
-    computedPercentage () {
-      return Math.max(0, Math.min(100, this.percentage))
+    percentageStyle () {
+      const val = Math.max(0, Math.min(100, this.percentage))
+      if (val > 0) {
+        return { transition: 'transform 0.6s', transform: `translateX(${val - 100}%)` }
+      }
     }
   },
 
@@ -99,7 +103,7 @@ export default Vue.extend({
     },
 
     __onKeydown (e) {
-      if ([13, 32].includes(e.keyCode) === true) {
+      if (isKeyCode(e, [ 13, 32 ]) === true) {
         stopAndPrevent(e)
 
         if (keyboardTarget !== this.$el) {
@@ -134,6 +138,7 @@ export default Vue.extend({
       if (mouseTarget !== this.$el) {
         mouseTarget !== void 0 && this.__cleanup()
         mouseTarget = this.$el
+        this.$el.classList.add('q-btn--active')
         document.addEventListener('mouseup', this.__onPressEnd, passiveCapture)
       }
 
@@ -141,12 +146,18 @@ export default Vue.extend({
     },
 
     __onPressEnd (e) {
+      // needed for IE (because it emits blur when focusing button from focus helper)
+      if (e !== void 0 && e.type === 'blur' && document.activeElement === this.$el) {
+        return
+      }
+
       if (e !== void 0 && e.type === 'keyup') {
-        if (keyboardTarget === this.$el && [13, 32].includes(e.keyCode) === true) {
+        if (keyboardTarget === this.$el && isKeyCode(e, [ 13, 32 ]) === true) {
           // for click trigger
           const evt = new MouseEvent('click', e)
           evt.qKeyEvent = true
-          e.defaultPrevented === true && evt.preventDefault()
+          e.defaultPrevented === true && prevent(evt)
+          e.cancelBubble === true && stop(evt)
           this.$el.dispatchEvent(evt)
 
           stopAndPrevent(e)
@@ -198,14 +209,13 @@ export default Vue.extend({
   },
 
   render (h) {
-    const
-      inner = [],
-      data = {
-        staticClass: 'q-btn inline q-btn-item non-selectable no-outline',
-        class: this.classes,
-        style: this.style,
-        attrs: this.attrs
-      }
+    let inner = []
+    const data = {
+      staticClass: 'q-btn q-btn-item non-selectable no-outline',
+      class: this.classes,
+      style: this.style,
+      attrs: this.attrs
+    }
 
     if (this.isActionable === true) {
       data.on = {
@@ -228,22 +238,17 @@ export default Vue.extend({
       }]
     }
 
-    if (this.icon !== void 0) {
-      inner.push(
-        h(QIcon, {
-          props: { name: this.icon, left: this.stack === false && this.hasLabel === true }
-        })
-      )
-    }
+    this.icon !== void 0 && inner.push(
+      h(QIcon, {
+        props: { name: this.icon, left: this.stack === false && this.hasLabel === true }
+      })
+    )
 
-    if (this.hasLabel === true) {
-      inner.push(
-        h('div', [ this.label ])
-      )
-    }
+    this.hasLabel === true && inner.push(
+      h('div', [ this.label ])
+    )
 
-    const def = slot(this, 'default')
-    def !== void 0 && inner.push(def)
+    inner = mergeSlot(inner, this, 'default')
 
     if (this.iconRight !== void 0 && this.isRound === false) {
       inner.push(
@@ -263,17 +268,25 @@ export default Vue.extend({
 
     this.loading === true && this.percentage !== void 0 && child.push(
       h('div', {
-        staticClass: 'q-btn__progress absolute-full',
-        class: this.darkPercentage === true ? 'q-btn__progress--dark' : '',
-        style: { transform: `scale3d(${this.computedPercentage / 100},1,1)` }
-      })
+        staticClass: 'q-btn__progress absolute-full overflow-hidden'
+      }, [
+        h('div', {
+          staticClass: 'q-btn__progress-indicator fit',
+          class: this.darkPercentage === true ? 'q-btn__progress--dark' : '',
+          style: this.percentageStyle
+        })
+      ])
     )
 
     child.push(
       h('div', {
-        staticClass: 'q-btn__content text-center col items-center q-anchor--skip',
-        class: this.innerClasses
-      }, inner)
+        staticClass: 'q-btn__wrapper col row q-anchor--skip'
+      }, [
+        h('div', {
+          staticClass: 'q-btn__content text-center col items-center q-anchor--skip',
+          class: this.innerClasses
+        }, inner)
+      ])
     )
 
     this.loading !== null && child.push(

@@ -1,11 +1,13 @@
 import Vue from 'vue'
 
-import uid from '../../utils/uid.js'
 import QIcon from '../icon/QIcon.js'
 import RippleMixin from '../../mixins/ripple.js'
 
 import { stop } from '../../utils/event.js'
-import slot from '../../utils/slot.js'
+import { mergeSlot } from '../../utils/slot.js'
+import { isKeyCode } from '../../utils/key-composition.js'
+
+let uid = 0
 
 export default Vue.extend({
   name: 'QTab',
@@ -30,7 +32,7 @@ export default Vue.extend({
 
     name: {
       type: [Number, String],
-      default: () => uid()
+      default: () => `t_${uid++}`
     },
 
     noCaps: Boolean,
@@ -72,7 +74,7 @@ export default Vue.extend({
     },
 
     __onKeyup (e) {
-      e.keyCode === 13 && this.__activate(e, true)
+      isKeyCode(e, 13) === true && this.__activate(e, true)
     },
 
     __getContent (h) {
@@ -106,7 +108,7 @@ export default Vue.extend({
         h('div', {
           staticClass: 'q-tab__content self-stretch flex-center relative-position q-anchor--skip non-selectable',
           class: this.tabs.inlineLabel === true ? 'row no-wrap q-tab__content--inline' : 'column'
-        }, content.concat(slot(this, 'default')))
+        }, mergeSlot(content, this, 'default'))
       ]
 
       !narrow && node.push(indicator)

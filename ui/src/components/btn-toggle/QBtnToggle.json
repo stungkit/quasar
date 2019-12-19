@@ -1,6 +1,10 @@
 {
   "mixins": [ "mixins/ripple" ],
 
+  "meta": {
+    "docsUrl": "https://v1.quasar.dev/vue-components/button-toggle"
+  },
+
   "behavior": {
     "$listeners": true
   },
@@ -150,12 +154,24 @@
       "type": "Boolean",
       "desc": "When used on flexbox parent, button will stretch to parent's height",
       "category": "content"
+    },
+
+    "clearable": {
+      "type": "Boolean",
+      "desc": "Clears model on click of the already selected button",
+      "category": "model",
+      "addedIn": "v1.4.4"
     }
   },
 
   "events": {
     "input": {
       "extends": "input"
+    },
+
+    "clear": {
+      "desc": "When using the 'clearable' property, this event is emitted when the already selected button is clicked",
+      "addedIn": "v1.4.4"
     }
   }
 }
