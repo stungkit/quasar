@@ -161,8 +161,8 @@ export default Vue.extend({
       }
 
       return this.inputClass === void 0
-        ? 'q-select__input--padding'
-        : [this.inputClass, 'q-select__input--padding']
+        ? 'q-field__input--padding'
+        : [this.inputClass, 'q-field__input--padding']
     },
 
     menuContentClass () {
@@ -347,7 +347,7 @@ export default Vue.extend({
       this.$emit('input', model)
     },
 
-    toggleOption (opt) {
+    toggleOption (opt, keepOpen) {
       if (this.editable !== true || opt === void 0 || this.__isDisabled(opt) === true) {
         return
       }
@@ -355,14 +355,17 @@ export default Vue.extend({
       const optValue = this.__getOptionValue(opt)
 
       if (this.multiple !== true) {
-        this.updateInputValue(
-          this.fillInput === true ? this.__getOptionLabel(opt) : '',
-          true,
-          true
-        )
-
         this.$refs.target !== void 0 && this.$refs.target.focus()
-        this.hidePopup()
+
+        if (keepOpen !== true) {
+          this.updateInputValue(
+            this.fillInput === true ? this.__getOptionLabel(opt) : '',
+            true,
+            true
+          )
+
+          this.hidePopup()
+        }
 
         if (isDeepEqual(this.__getOptionValue(this.value), optValue) !== true) {
           this.$emit('input', this.emitValue === true ? optValue : opt)
@@ -409,6 +412,32 @@ export default Vue.extend({
 
       if (this.optionIndex !== val) {
         this.optionIndex = val
+      }
+    },
+
+    moveOptionSelection (offset = 1) {
+      if (this.menu === true) {
+        let index = this.optionIndex
+        do {
+          index = normalizeToInterval(
+            index + offset,
+            -1,
+            this.virtualScrollLength - 1
+          )
+        }
+        while (index !== -1 && index !== this.optionIndex && this.__isDisabled(this.options[index]) === true)
+
+        if (this.optionIndex !== index) {
+          this.setOptionIndex(index)
+          this.scrollTo(index)
+
+          if (index >= 0 && this.useInput === true && this.fillInput === true) {
+            const inputValue = this.__getOptionLabel(this.options[index])
+            if (this.inputValue !== inputValue) {
+              this.inputValue = inputValue
+            }
+          }
+        }
       }
     },
 
@@ -496,7 +525,7 @@ export default Vue.extend({
         return
       }
 
-      if (e.target !== this.$refs.target) { return }
+      if (e.target === void 0 || e.target.id !== this.targetUid) { return }
 
       // down
       if (
@@ -521,35 +550,12 @@ export default Vue.extend({
       }
 
       // up, down
-      const optionsLength = this.virtualScrollLength
-
       if (e.keyCode === 38 || e.keyCode === 40) {
         stopAndPrevent(e)
-
-        if (this.menu === true) {
-          let index = this.optionIndex
-          do {
-            index = normalizeToInterval(
-              index + (e.keyCode === 38 ? -1 : 1),
-              -1,
-              optionsLength - 1
-            )
-          }
-          while (index !== -1 && index !== this.optionIndex && this.__isDisabled(this.options[index]) === true)
-
-          if (this.optionIndex !== index) {
-            this.setOptionIndex(index)
-            this.scrollTo(index)
-
-            if (index >= 0 && this.useInput === true && this.fillInput === true) {
-              const inputValue = this.__getOptionLabel(this.options[index])
-              if (this.inputValue !== inputValue) {
-                this.inputValue = inputValue
-              }
-            }
-          }
-        }
+        this.moveOptionSelection(e.keyCode === 38 ? -1 : 1)
       }
+
+      const optionsLength = this.virtualScrollLength
 
       // keyboard search when not having use-input
       if (optionsLength > 0 && this.useInput !== true && e.keyCode >= 48 && e.keyCode <= 90) {
@@ -601,13 +607,11 @@ export default Vue.extend({
       }
 
       // enter, space (when not using use-input), or tab (when not using multiple and option selected)
+      // same target is checked above
       if (
-        e.target !== this.$refs.target ||
-        (
-          e.keyCode !== 13 &&
-          (this.useInput === true || e.keyCode !== 32) &&
-          (tabShouldSelect === false || e.keyCode !== 9)
-        )
+        e.keyCode !== 13 &&
+        (this.useInput === true || e.keyCode !== 32) &&
+        (tabShouldSelect === false || e.keyCode !== 9)
       ) { return }
 
       e.keyCode !== 9 && stopAndPrevent(e)
@@ -640,6 +644,11 @@ export default Vue.extend({
           }
 
           this.updateInputValue('', this.multiple !== true, true)
+
+          if (this.multiple !== true) {
+            this.$refs.target !== void 0 && this.$refs.target.focus()
+            this.hidePopup()
+          }
         }
 
         if (this.$listeners['new-value'] !== void 0) {
@@ -819,7 +828,7 @@ export default Vue.extend({
 
       return h('input', {
         ref: 'target',
-        staticClass: 'q-select__input q-placeholder col',
+        staticClass: 'q-field__input q-placeholder col',
         style: this.inputStyle,
         class: this.computedInputClass,
         domProps: { value: this.inputValue !== void 0 ? this.inputValue : '' },
@@ -903,10 +912,12 @@ export default Vue.extend({
       this.$emit(
         'filter',
         val,
-        fn => {
+        (fn, afterFn) => {
           if (this.focused === true && this.filterId === filterId) {
             clearTimeout(this.filterId)
+
             typeof fn === 'function' && fn()
+
             this.$nextTick(() => {
               this.innerLoading = false
               if (this.menu === true) {
@@ -915,6 +926,8 @@ export default Vue.extend({
               else {
                 this.menu = true
               }
+
+              typeof afterFn === 'function' && this.$nextTick(() => { afterFn(this) })
             })
           }
         },
@@ -950,7 +963,7 @@ export default Vue.extend({
           if (this.hasDialog !== true) {
             // label from QField will propagate click on the input (except IE)
             if (
-              (this.useInput === true && e.target.classList.contains('q-select__input') !== true) ||
+              (this.useInput === true && e.target.classList.contains('q-field__input') !== true) ||
               (this.useInput !== true && e.target.classList.contains('no-outline') === true)
             ) {
               return

@@ -1,4 +1,4 @@
-import { isSSR, client } from '../plugins/Platform.js'
+import { isSSR, client, iosEmulated } from '../plugins/Platform.js'
 import { listenOpts } from './event.js'
 
 const directions = ['left', 'right', 'up', 'down', 'horizontal', 'vertical']
@@ -47,6 +47,7 @@ export function getModifierDirections (mod) {
 
 export function updateModifiers (ctx, { oldValue, value, modifiers }) {
   if (oldValue !== value) {
+    typeof value !== 'function' && ctx.end()
     ctx.handler = value
   }
 
@@ -82,10 +83,18 @@ export function cleanEvt (ctx, target) {
   }
 }
 
-export const getTouchTarget = isSSR === false && (
+export const getTouchTarget = isSSR === false && iosEmulated !== true && (
   client.is.ios === true ||
-  (client.is.mac === true && client.has.touch === true) || // is desktop view requested iOS
   window.navigator.vendor.toLowerCase().indexOf('apple') > -1
 )
   ? () => document
   : target => target
+
+export function shouldStart (evt, ctx) {
+  return ctx.event === void 0 &&
+    evt.target !== void 0 &&
+    evt.target.draggable !== true &&
+    typeof ctx.handler === 'function' &&
+    evt.target.nodeName.toUpperCase() !== 'INPUT' &&
+    (evt.qClonedBy === void 0 || evt.qClonedBy.indexOf(ctx.uid) === -1)
+}
