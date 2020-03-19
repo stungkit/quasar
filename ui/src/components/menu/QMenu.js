@@ -161,6 +161,7 @@ export default Vue.extend({
           this.__portal.$el.click()
         }
 
+        this.updatePosition()
         this.$emit('show', evt)
       }, 300)
     },
@@ -231,7 +232,7 @@ export default Vue.extend({
     },
 
     updatePosition () {
-      if (this.__portal === void 0) {
+      if (this.anchorEl === void 0 || this.__portal === void 0) {
         return
       }
 
@@ -291,7 +292,7 @@ export default Vue.extend({
       }, [
         this.showing === true ? h('div', {
           ref: 'inner',
-          staticClass: 'q-menu scroll' + this.menuClass,
+          staticClass: 'q-menu q-position-engine scroll' + this.menuClass,
           class: this.contentClass,
           style: this.contentStyle,
           attrs: {

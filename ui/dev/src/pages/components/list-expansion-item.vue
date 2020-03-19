@@ -5,7 +5,7 @@
         Explore the possibilities
       </p>
       <pre>Model: {{ open }}</pre>
-      <q-list bordered padding>
+      <q-list bordered>
         <q-expansion-item
           expand-separator
           icon="perm_identity"
@@ -165,6 +165,18 @@
             {{ lorem }}
           </div>
         </q-expansion-item>
+
+        <q-expansion-item expand-separator dense label="With textarea autogrow - default CLOSED">
+          <div class="q-pa-md">
+            <q-input v-model="lorem" stack-label label="textarea" outlined autogrow class="bg-white" />
+          </div>
+        </q-expansion-item>
+
+        <q-expansion-item expand-separator dense label="With textarea autogrow - default OPENED" default-opened>
+          <div class="q-pa-md">
+            <q-input v-model="lorem" stack-label label="textarea" outlined autogrow class="bg-white" />
+          </div>
+        </q-expansion-item>
       </q-list>
 
       <p class="caption">
@@ -299,14 +311,14 @@
         Switch toggle side
       </p>
       <q-list bordered padding inset-separator>
-        <q-expansion-item switch-toggle-side icon="mail" label="Inbox" caption="5 unread emails">
+        <q-expansion-item expand-icon-toggle switch-toggle-side icon="mail" label="Inbox" caption="5 unread emails">
           <q-card>
             <q-card-section>
               {{ lorem }}
             </q-card-section>
           </q-card>
         </q-expansion-item>
-        <q-expansion-item switch-toggle-side icon="send" label="Outbox" caption="Empty">
+        <q-expansion-item expand-icon-toggle switch-toggle-side icon="send" label="Outbox" caption="Empty">
           <q-card>
             <q-card-section>
               {{ lorem }}
@@ -314,14 +326,14 @@
           </q-card>
         </q-expansion-item>
         <q-separator />
-        <q-expansion-item switch-toggle-side dense-toggle icon="mail" label="Inbox" caption="5 unread emails">
+        <q-expansion-item expand-icon-toggle switch-toggle-side dense-toggle icon="mail" label="Inbox" caption="5 unread emails">
           <q-card>
             <q-card-section>
               {{ lorem }}
             </q-card-section>
           </q-card>
         </q-expansion-item>
-        <q-expansion-item switch-toggle-side dense-toggle icon="mail" label="Inbox" caption="5 unread emails">
+        <q-expansion-item expand-icon-toggle switch-toggle-side dense-toggle icon="mail" label="Inbox" caption="5 unread emails">
           <q-card>
             <q-card-section>
               {{ lorem }}

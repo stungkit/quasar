@@ -63,12 +63,12 @@ export default {
   },
   watch: {
     lang (lang) {
-      import(`quasar/lang/${lang}`).then(lang => {
+      import('quasar/lang/' + lang).then(lang => {
         this.$q.lang.set(lang.default)
       })
     },
     iconSet (set) {
-      import(`quasar/icon-set/${set}`).then(iconSet => {
+      import('quasar/icon-set/' + set).then(iconSet => {
         this.$q.iconSet.set(iconSet.default)
       })
     }
@@ -86,20 +86,22 @@ export default {
     this.langOptions = languages.map(lang => ({ label: lang.nativeName, value: lang.isoName }))
     this.iconOptions = [
       { label: 'Material', value: 'material-icons' },
+      { label: 'SVG Material', value: 'svg-material-icons' },
       { label: 'Material Outlined', value: 'material-icons-outlined' },
       { label: 'Material Round', value: 'material-icons-round' },
       { label: 'Material Sharp', value: 'material-icons-sharp' },
-      { label: 'MDI v4', value: 'mdi-v4' },
+      { label: 'MDI v5', value: 'mdi-v5' },
+      { label: 'SVG MDI v5', value: 'svg-mdi-v5' },
       { label: 'Ionicons v4', value: 'ionicons-v4' },
-      { label: 'Fontawesome v5', value: 'fontawesome-v5' },
-      { label: 'Eva Icons', value: 'eva-icons' },
-      { label: 'Themify', value: 'themify' },
-      { label: 'SVG Material', value: 'svg-material-icons' },
-      { label: 'SVG MDI v4', value: 'svg-mdi-v4' },
       { label: 'SVG Ionicons v4', value: 'svg-ionicons-v4' },
+      { label: 'Fontawesome v5', value: 'fontawesome-v5' },
       { label: 'SVG Fontawesome v5', value: 'svg-fontawesome-v5' },
+      { label: 'Eva Icons', value: 'eva-icons' },
       { label: 'SVG Eva Icons', value: 'svg-eva-icons' },
-      { label: 'SVG Themify', value: 'svg-themify' }
+      { label: 'Themify', value: 'themify' },
+      { label: 'SVG Themify', value: 'svg-themify' },
+      { label: 'Line Awesome', value: 'line-awesome' },
+      { label: 'SVG Line Awesome', value: 'svg-line-awesome' }
     ]
   },
   mounted () {

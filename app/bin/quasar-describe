@@ -409,7 +409,7 @@ function printModifiers ({ modifiers }) {
   for (let modifierName in modifiers) {
     const modifier = modifiers[modifierName]
     console.log('\n   ' + chalk.green(modifierName))
-    printProp(modifier, void 0, 5)
+    printProp(modifier, modifierName, 5)
   }
 }
 
@@ -460,6 +460,7 @@ function printQuasarConfOptions ({ quasarConfOptions }) {
 function describe (api) {
   switch (api.type) {
     case 'component':
+      apiParts.quasar === true && printQuasarConfOptions(api)
       apiParts.props === true && printProperties(api)
       apiParts.slots === true && printSlots(api)
       apiParts.slots === true && printScopedSlots(api)
@@ -468,6 +469,7 @@ function describe (api) {
       break
 
     case 'directive':
+      apiParts.quasar === true && printQuasarConfOptions(api)
       apiParts.value === true && printValue(api)
       apiParts.arg === true && printArg(api)
       apiParts.modifiers === true && printModifiers(api)
@@ -499,7 +501,7 @@ async function run () {
         openBrowser({ url: api.meta.docsUrl, wait: false })
       }
       else {
-        console.log(` Opening the docs URL also requires "quasar" v1.5.0+`)
+        console.log(` Opening the docs URL also requires "quasar" v1.5+`)
         console.log()
       }
     }

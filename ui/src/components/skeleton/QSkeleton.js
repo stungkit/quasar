@@ -1,6 +1,7 @@
 import Vue from 'vue'
 
 import DarkMixin from '../../mixins/dark.js'
+import TagMixin from '../../mixins/tag.js'
 
 import { slot } from '../../utils/slot.js'
 
@@ -19,7 +20,7 @@ export const skeletonAnimations = [
 export default Vue.extend({
   name: 'QSkeleton',
 
-  mixins: [ DarkMixin ],
+  mixins: [ DarkMixin, TagMixin ],
 
   props: {
     type: {
@@ -39,12 +40,7 @@ export default Vue.extend({
 
     size: String,
     width: String,
-    height: String,
-
-    tag: {
-      type: String,
-      default: 'div'
-    }
+    height: String
   },
 
   computed: {
@@ -56,7 +52,7 @@ export default Vue.extend({
 
     classes () {
       return `q-skeleton--${this.isDark === true ? 'dark' : 'light'} q-skeleton--type-${this.type}` +
-        (this.animation !== 'none' ? ` q-skeleton--anim-${this.animation}` : '') +
+        (this.animation !== 'none' ? ` q-skeleton--anim q-skeleton--anim-${this.animation}` : '') +
         (this.square === true ? ' q-skeleton--square' : '') +
         (this.bordered === true ? ' q-skeleton--bordered' : '')
     }
@@ -66,7 +62,8 @@ export default Vue.extend({
     return h(this.tag, {
       staticClass: 'q-skeleton',
       class: this.classes,
-      style: this.style
+      style: this.style,
+      on: this.$listeners
     }, slot(this, 'default'))
   }
 })

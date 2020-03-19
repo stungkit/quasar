@@ -59,7 +59,8 @@ export default Vue.extend({
 
     autofocus: Boolean,
 
-    for: [String],
+    for: String,
+
     maxlength: [Number, String],
     maxValues: [Number, String] // private, do not add to JSON; internally needed by QSelect
   },
@@ -101,7 +102,10 @@ export default Vue.extend({
         const len = typeof this.value === 'string' || typeof this.value === 'number'
           ? ('' + this.value).length
           : (Array.isArray(this.value) === true ? this.value.length : 0)
-        const max = this.maxlength !== void 0 ? this.maxlength : this.maxValues
+
+        const max = this.maxlength !== void 0
+          ? this.maxlength
+          : this.maxValues
 
         return len + (max !== void 0 ? ' / ' + max : '')
       }
@@ -203,6 +207,21 @@ export default Vue.extend({
         value: this.value,
         emitValue: this.__emitValue
       }
+    },
+
+    attrs () {
+      const attrs = {
+        for: this.targetUid
+      }
+
+      if (this.disable === true) {
+        attrs['aria-disabled'] = ''
+      }
+      else if (this.readonly === true) {
+        attrs['aria-readonly'] = ''
+      }
+
+      return attrs
     }
   },
 
@@ -292,8 +311,8 @@ export default Vue.extend({
         this.__getInnerAppendNode(h, 'inner-append', this.__getInnerAppend(h))
       )
 
-      this.__getPopup !== void 0 && node.push(
-        this.__getPopup(h)
+      this.__getControlChild !== void 0 && node.push(
+        this.__getControlChild(h)
       )
 
       return node
@@ -479,9 +498,7 @@ export default Vue.extend({
     return h('label', {
       staticClass: 'q-field row no-wrap items-start',
       class: this.classes,
-      attrs: {
-        for: this.targetUid
-      }
+      attrs: this.attrs
     }, [
       this.$scopedSlots.before !== void 0 ? h('div', {
         staticClass: 'q-field__before q-field__marginal row no-wrap items-center',

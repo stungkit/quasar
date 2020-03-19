@@ -12,6 +12,7 @@ module.exports = function (ctx) {
       'fontawesome-v5',
       'eva-icons',
       'themify',
+      'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       'roboto-font',
@@ -22,13 +23,15 @@ module.exports = function (ctx) {
     ],
 
     framework: {
+      // iconSet: 'svg-mdi-v4',
+      // config: { ripple: { early: true } },
       all: true
     },
 
     supportIE: true,
 
     build: {
-      rtl: false,
+      rtl: true,
       vueRouterMode: 'history',
       showProgress: true,
 
@@ -42,7 +45,12 @@ module.exports = function (ctx) {
           .set('quasar/icon-set', path.join(__dirname, '../icon-set'))
           .set('quasar/lang', path.join(__dirname, '../lang'))
           .set('quasar/src', path.join(__dirname, '../src/'))
-      }
+      },
+
+      transpileDependencies: [
+        'ansi-regex',
+        'strip-ansi'
+      ]
     },
 
     devServer: {

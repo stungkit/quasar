@@ -117,7 +117,7 @@
         "scroll-target=\"body\""
       ],
       "category": "behavior",
-      "addedIn": "v1.7.5"
+      "addedIn": "v1.8.0"
     }
   },
 
@@ -170,6 +170,10 @@
       }
     },
 
+    "after-show": {
+      "desc": "Emitted when component show animation is finished"
+    },
+
     "hide": {
       "desc": "Emitted after component has triggered hide()",
       "params": {
@@ -192,6 +196,10 @@
           "__exemption": [ "examples" ]
         }
       }
+    },
+
+    "after-hide": {
+      "desc": "Emitted when component hide animation is finished"
     },
 
     "click": {

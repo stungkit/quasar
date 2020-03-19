@@ -117,7 +117,7 @@ expires: -1 // yesterday
 expires: 'Mon, 06 Jan 2020 12:52:55 GMT'
 expires: new Date() // some JS Date Object
 
-// Following formats require Quasar v1.7.0+:
+// Following formats require Quasar v1.7+:
 
 expires: '1d 3h 5m' // in 1 day, 3 hours, 5 minutes
 expires: '2d' // in 2 days
@@ -171,6 +171,10 @@ secure: true
 ```
 
 If true, the cookie transmission requires a secure protocol (HTTPS) and will NOT be sent over HTTP. Default value is `false`.
+
+::: tip
+If using Quasar CLI and [on dev mode](/quasar-cli/quasar-conf-js#Property%3A-devServer), you can enable HTTPS through quasar.conf.js > devServer > https: true.
+:::
 
 ### Option: other
 
