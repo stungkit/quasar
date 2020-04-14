@@ -469,6 +469,52 @@ const cli = [
     ]
   },
   {
+    name: 'Developing Browser Extensions',
+    path: 'developing-browser-extensions',
+    children: [
+      {
+        name: 'Introduction',
+        path: 'introduction'
+      },
+      {
+        name: 'Preparation',
+        path: 'preparation'
+      },
+      {
+        name: 'Configuring BEX',
+        path: 'configuring-bex'
+      },
+      {
+        name: 'App Icons for BEX',
+        path: 'app-icons-browser-extension'
+      },
+      {
+        name: 'Build Commands',
+        path: 'build-commands'
+      },
+      {
+        name: 'Types of BEX',
+        path: 'types-of-bex'
+      },
+      {
+        name: 'BEX Communication / Events',
+        path: 'bex-communication'
+      },
+      {
+        name: 'Background Hooks',
+        path: 'background-hooks'
+      },
+      {
+        name: 'Content Hooks',
+        path: 'content-hooks'
+      },
+      {
+        name: 'DOM Hooks',
+        path: 'dom-hooks'
+      }
+    ]
+  },
+  {
     name: 'Ajax Requests',
     path: 'ajax-requests'
   },
@@ -556,6 +602,11 @@ const layout = [
         path: 'gutter'
       },
       {
+        name: 'Flexbox patterns',
+        badge: 'new',
+        path: 'flexbox-patterns'
+      },
+      {
         name: 'Flex Playground',
         path: 'flex-playground'
       }
@@ -596,7 +647,6 @@ const layout = [
   },
   {
     name: 'Page Scroller',
-    badge: 'update',
     path: 'page-scroller'
   }
 ]
@@ -616,7 +666,6 @@ const directives = [
   },
   {
     name: 'Material Ripples',
-    badge: 'update',
     path: 'material-ripple'
   },
   {
@@ -747,12 +796,10 @@ const components = [
   },
   {
     name: 'Card',
-    badge: 'update',
     path: 'card'
   },
   {
     name: 'Carousel',
-    badge: 'update',
     path: 'carousel'
   },
   {
@@ -816,17 +863,14 @@ const components = [
       },
       {
         name: 'Radio',
-        badge: 'update',
         path: 'radio'
       },
       {
         name: 'Checkbox',
-        badge: 'update',
         path: 'checkbox'
       },
       {
         name: 'Toggle',
-        badge: 'update',
         path: 'toggle'
       },
       {
@@ -857,7 +901,6 @@ const components = [
   },
   {
     name: 'Icon',
-    badge: 'update',
     path: 'icon'
   },
   {
@@ -936,12 +979,10 @@ const components = [
   },
   {
     name: 'Rating',
-    badge: 'update',
     path: 'rating'
   },
   {
     name: 'Responsive',
-    badge: 'new',
     path: 'responsive'
   },
   {
@@ -983,7 +1024,6 @@ const components = [
   },
   {
     name: 'Table',
-    badge: 'update',
     path: 'table'
   },
   {
@@ -1120,92 +1160,6 @@ const utils = [
   }
 ]
 
-/*
-// FIREBASE DOCS: UNCOMMENT WHEN READY TO RELEASE
-const firebaseAuthTypes = [{
-  name: 'Email',
-  path: 'email'
-}]
-
-const backends = [
-  {
-    name: 'AWS -- Amplify',
-    path: 'aws-amplify'
-  },
-  {
-    name: 'GraphQL',
-    path: 'graphQL'
-  },
-  {
-    name: 'Feathers JS',
-    path: 'feathersjs'
-  },
-  {
-    name: 'Firebase',
-    opened: false,
-    children: [
-      {
-        name: 'Introduction',
-        path: 'firebase/introduction'
-      },
-      {
-        name: 'Installation',
-        path: 'firebase/install'
-      },
-      {
-        name: 'Service Structure',
-        path: 'firebase/structure'
-      },
-      {
-        name: 'Route Guarding',
-        path: 'firebase/routeGuards'
-      },
-      {
-        name: 'Authentication',
-        path: 'firebase/authTypes',
-        children: firebaseAuthTypes
-      },
-      {
-        name: 'Data Store',
-        path: 'firebase/dataStore'
-      },
-      {
-        name: 'Hosting',
-        path: 'firebase/hosting'
-      },
-      {
-        name: 'Messaging',
-        path: 'firebase/messaging'
-      },
-      {
-        name: 'Storage',
-        path: 'firebase/storage'
-      },
-      {
-        name: 'SSR',
-        path: 'firebase/custom'
-      },
-      {
-        name: 'Vuex',
-        path: 'firebase/vuex'
-      },
-      {
-        name: 'Custom Implementations',
-        path: 'firebase/custom'
-      },
-      {
-        name: 'Firebase CLI',
-        path: 'firebase/cli'
-      }
-    ]
-  },
-  {
-    name: 'Laravel',
-    path: 'laravel'
-  }
-]
-*/
-
 module.exports = [
   {
     name: 'Why Quasar?',
@@ -1304,14 +1258,4 @@ module.exports = [
     path: 'quasar-utils',
     children: utils
   }
-
-  /*
-  // FIREBASE DOCS: UNCOMMENT WHEN READY TO RELEASE
-  ,{
-    name: 'Backend & API',
-    icon: 'storage',
-    path: 'backend-and-api',
-    children: backends
-  }
-  */
 ]
