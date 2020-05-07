@@ -50,6 +50,11 @@ module.exports = function (cfg, configName) {
   chain.resolve.extensions
     .merge([ '.mjs', '.js', '.vue', '.json' ])
 
+  if (cfg.supportTS === true) {
+    chain.resolve.extensions
+      .merge([ '.ts' ])
+  }
+
   chain.resolve.modules
     .merge(resolveModules)
 
@@ -61,7 +66,9 @@ module.exports = function (cfg, configName) {
       layouts: appPaths.resolve.src(`layouts`),
       pages: appPaths.resolve.src(`pages`),
       assets: appPaths.resolve.src(`assets`),
-      boot: appPaths.resolve.src(`boot`)
+      boot: appPaths.resolve.src(`boot`),
+
+      'src-bex': appPaths.bexDir // needed for app/templates
     })
 
   if (cfg.framework.all === true) {

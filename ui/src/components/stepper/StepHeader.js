@@ -3,8 +3,12 @@ import Vue from 'vue'
 import QIcon from '../icon/QIcon.js'
 import Ripple from '../../directives/Ripple.js'
 
+import AttrsMixin from '../../mixins/attrs.js'
+
 export default Vue.extend({
   name: 'StepHeader',
+
+  mixins: [ AttrsMixin ],
 
   directives: {
     Ripple
@@ -80,7 +84,7 @@ export default Vue.extend({
       if (errorColor !== void 0) {
         return errorColor
       }
-      if (this.disable === false && this.isDone === true) {
+      if (this.isDisable === false && this.isDone === true) {
         return this.step.doneColor || this.stepper.doneColor || this.step.color || this.stepper.inactiveColor
       }
 
@@ -126,11 +130,9 @@ export default Vue.extend({
           click: this.activate,
           keyup: this.keyup
         },
-        attrs: {
-          tabindex: this.isDisable === true
-            ? -1
-            : this.$attrs.tabindex || 0
-        }
+        attrs: this.isDisable === true
+          ? { tabindex: -1, 'aria-disabled': '' }
+          : { tabindex: this.qAttrs.tabindex || 0 }
       })
     }
 

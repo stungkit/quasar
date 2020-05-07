@@ -1,5 +1,5 @@
 /**
- * THIS FILE WILL BE OVERWRITTEN.
+ * THIS FILE IS GENERATED AUTOMATICALLY.
  * DO NOT EDIT.
  *
  * You are probably looking into adding hooks in your code. This should be done by means of
@@ -9,7 +9,7 @@
 
 /* global chrome */
 
-import attachBackgroundHooks from '../../../src-bex/js/background-hooks'
+import attachBackgroundHooks from 'src-bex/js/background-hooks'
 import Bridge from '../bridge'
 
 const connections = {}
@@ -87,10 +87,7 @@ chrome.runtime.onConnect.addListener(port => {
     }
   })
 
-  // Only mount the background hooks once; on app initialization.
-  if (port.name === 'app') {
-    attachBackgroundHooks(bridge, connections)
-  }
+  attachBackgroundHooks(bridge, connections)
 
   // Map a messaging layer between the App and ContentScript
   for (let connectionId in connections) {

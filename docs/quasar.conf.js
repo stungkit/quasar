@@ -19,14 +19,14 @@ module.exports = function (ctx) {
       'material-icons'
     ],
 
-    supportIE: true,
-    preFetch: true,
+    // supportIE: true,
+    // preFetch: true,
 
     build: {
       scopeHoisting: true,
       vueRouterMode: 'history',
       showProgress: ctx.dev,
-      // preloadChunks: false,
+      // preloadChunks: true,
       // vueCompiler: true,
       // gzip: true,
       // analyze: true,
@@ -74,7 +74,7 @@ module.exports = function (ctx) {
     },
 
     devServer: {
-      https: ctx.mode.pwa === true,
+      // https: true,
       port: 9090,
       open: true // opens browser window automatically
     },
@@ -99,12 +99,19 @@ module.exports = function (ctx) {
     pwa: {
       // workboxPluginMode: 'InjectManifest',
       workboxOptions: {
+        cleanupOutdatedCaches: true,
         skipWaiting: true,
-        clientsClaim: true
+        clientsClaim: true,
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/cdn/,
+            handler: 'StaleWhileRevalidate'
+          }
+        ]
       },
       manifest: {
         name: 'Quasar Documentation',
-        short_name: 'Quasar-Docs',
+        short_name: 'Quasar Docs',
         description: 'Quasar Framework Documentation',
         display: 'standalone',
         orientation: 'portrait',
@@ -174,6 +181,22 @@ module.exports = function (ctx) {
 
         // appId: 'quasar-app'
       }
+    },
+
+    vendor: {
+      remove: [
+        'quasar/dist/api',
+
+        // following are used by algolia
+        'algoliasearch',
+        'autocomplete.js',
+        'hogan.js',
+        'request',
+        'stack-utils',
+        'to-factory',
+        'zepto',
+        'es6-promise'
+      ]
     }
   }
 }
