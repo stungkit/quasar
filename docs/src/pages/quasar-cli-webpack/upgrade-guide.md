@@ -165,7 +165,7 @@ $ pnpm create quasar@latest
 $ bun create quasar@latest
 ```
 <br>
-When asked to "Pick Quasar App CLI variant", answer with: "Quasar App CLI with Webpack (v4)".
+When asked to "Pick Quasar App CLI variant", answer with: "Quasar App CLI with Webpack".
 :::
 
 Preparations:
